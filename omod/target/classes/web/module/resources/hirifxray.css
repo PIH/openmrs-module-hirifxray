@@ -1,0 +1,37 @@
+#gutter {
+	border-color: white;
+}
+
+.pihPlum {
+	color: #621B4B;
+}
+
+div {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+div.fullBar {
+	width: 100%;
+	left: 0px;
+	right: 0px;
+}
+
+div.topBar {
+	height: 1.5em;
+	font-size: 1.2em;
+	font-weight: bold;
+	text-align: left;
+	color: white;
+	background-color: #009384;
+	vertical-align: middle;
+	position: absolute;
+	padding-top:4px;
+	padding-left:10px;
+	margin-top: 5px;
+}
+
+a.boldWhiteLink {
+	text-decoration:none;	
+	color: white;
+	font-weight: bold;
+}
