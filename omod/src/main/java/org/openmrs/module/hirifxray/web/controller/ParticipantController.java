@@ -1,5 +1,6 @@
 package org.openmrs.module.hirifxray.web.controller;
 
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -7,6 +8,8 @@ import org.openmrs.PersonName;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hirifxray.HirifxrayUtil;
+import org.openmrs.obs.ComplexData;
+import org.openmrs.propertyeditor.ConceptEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,8 +17,10 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -29,6 +34,7 @@ public class ParticipantController {
 		SimpleDateFormat dateFormat = Context.getDateFormat();
 		dateFormat.setLenient(false);
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat,true, 10));
+		binder.registerCustomEditor(Concept.class, new ConceptEditor());
 	}
     
     @RequestMapping("/module/hirifxray/participant.form")
@@ -43,6 +49,13 @@ public class ParticipantController {
 
 		Patient patient = Context.getPatientService().getPatient(id);
 		model.addAttribute("patient", patient);
+
+		Map<String, Concept> xraysConcepts = new LinkedHashMap<String, Concept>();
+		xraysConcepts.put("enrollmentXray", HirifxrayUtil.getEnrollmentXrayConcept());
+		xraysConcepts.put("visit9Xray", HirifxrayUtil.getVisit9XrayConcept());
+		xraysConcepts.put("visit13Xray", HirifxrayUtil.getVisit13XrayConcept());
+		xraysConcepts.put("earlyTerminationXray", HirifxrayUtil.getEarlyTerminationXrayConcept());
+		model.addAttribute("xraysConcepts", xraysConcepts);
 
 		Map<String, Obs> xrays = new LinkedHashMap<String, Obs>();
 		xrays.put("enrollmentXray", HirifxrayUtil.getEnrollmentXray(patient));
@@ -109,5 +122,32 @@ public class ParticipantController {
 		p = Context.getPatientService().savePatient(p);
 
 		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId();
+	}
+
+	@RequestMapping("/module/hirifxray/uploadXray.form")
+	public String uploadXray(ModelMap model,
+							 @RequestParam(value="patientId", required=true) Integer patientId,
+							 @RequestParam(value="type", required=true) String type,
+							 @RequestParam(value="concept", required=true) Concept concept,
+							 @RequestParam(value="obsDatetime", required=true) Date obsDatetime,
+							 @RequestParam(value="xrayFile", required=true) MultipartFile xrayFile) throws Exception {
+
+		Patient p = Context.getPatientService().getPatient(patientId);
+		Obs o = new Obs();
+		o.setPerson(p);
+		o.setObsDatetime(obsDatetime);
+		o.setConcept(concept);
+
+		String identifier = p.getPatientIdentifier().getIdentifier();
+
+		String[] fileParts = xrayFile.getOriginalFilename().split("\\.");
+		String xrayKey = identifier + "_" + type + "." + fileParts[fileParts.length-1];
+
+		ComplexData data = new ComplexData(xrayKey, xrayFile.getInputStream());
+		o.setComplexData(data);
+
+		Context.getObsService().saveObs(o, "Uploading " + type);
+
+		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId() + "&type="+type;
 	}
 }

@@ -34,6 +34,18 @@ public class HirifxrayUtil {
 		return Context.getPatientService().getAllPatientIdentifierTypes().get(0);
 	}
 
+	public static Concept getXrayGroupConcept() {
+		return Context.getConceptService().getConcept("HIRIF X-ray construct");
+	}
+
+	public static Concept getXrayImageConcept() {
+		return Context.getConceptService().getConcept("HIRIF X-ray image");
+	}
+
+	public static Concept getXrayTypeConcept() {
+		return Context.getConceptService().getConcept("Type of HIRIF X-ray");
+	}
+
 	public static Concept getEnrollmentXrayConcept() {
 		return Context.getConceptService().getConcept("Enrollment X-ray");
 	}

@@ -128,9 +128,31 @@
 		<c:if test="${!empty type}">
 			<fieldset>
 				<legend><b><spring:message code="hirifxray.${type}"/></b></legend>
-				<div style="height:300px;">
-
-
+				<div style="height:400px; padding:10px;">
+					<c:choose>
+						<c:when test="${empty xrays[type]}">
+							<form action="uploadXray.form" method="post" enctype="multipart/form-data">
+								<input type="hidden" name="patientId" value="${patient.patientId}"/>
+								<input type="hidden" name="type" value="${type}"/>
+								<input type="hidden" name="concept" value="${xraysConcepts[type].conceptId}"/>
+								<br/>
+								<b>Date of x-ray:</b><br/>
+								<openmrs_tag:dateField formFieldName="obsDatetime" startValue=""/>
+								<br/><br/>
+								<b>Image to upload:</b><br/>
+								<input type="file" name="xrayFile" size="50"/>
+								<br/><br/>
+								<input type="submit" value="Upload x-ray"/>
+							</form>
+						</c:when>
+						<c:otherwise>
+							<a href="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}&view=download&viewType=download">
+								Download Full Image
+							</a>
+							<br/><br/>
+							<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}" height="350"/>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</fieldset>
 		</c:if>
