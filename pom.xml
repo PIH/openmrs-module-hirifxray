@@ -29,6 +29,15 @@
 		<module>omod</module>
 	</modules>
 
+	<properties>
+		<openMRSVersion>1.9.4</openMRSVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<MODULE_ID>${project.parent.artifactId}</MODULE_ID>
+		<MODULE_NAME>${project.parent.name}</MODULE_NAME>
+		<MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
+		<MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -60,10 +69,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<properties>
-		<openMRSVersion>1.9.4</openMRSVersion>
-	</properties>
 
 	<build>
 		<resources>

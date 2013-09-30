@@ -11,25 +11,21 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.hirifxray.web.extension;
+package org.openmrs.module.hirifxray;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openmrs.module.web.extension.HeaderIncludeExt;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.context.Context;
 
 /**
- * Inserts custom HTML and javascript into the header full
+ * Utility methods
  */
-public class HeaderFullExtension extends HeaderIncludeExt {
+public class HirifxrayUtil {
 
-	/**
-	 * @see HeaderIncludeExt#getHeaderFiles()
-	 */
-	@Override
-	public List<String> getHeaderFiles() {
-		List<String> fileNames = new ArrayList<String>();
-		fileNames.add("/moduleResources/hirifxray/hirifxray.css");
-		return fileNames;
+	private Log log = LogFactory.getLog(this.getClass());
+
+	public static PatientIdentifierType getIdentifierType() {
+		return Context.getPatientService().getAllPatientIdentifierTypes().get(0);
 	}
 }

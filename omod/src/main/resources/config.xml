@@ -10,13 +10,6 @@
 	<description>HIRIF Study Xray Module</description>
 	<activator>@MODULE_PACKAGE@.HirifxrayActivator</activator>
 	<require_version>1.9.0</require_version>
-	
-	<!-- Extensions -->
-	
-	<extension>
-		<point>org.openmrs.headerFullIncludeExt</point>
-		<class>@MODULE_PACKAGE@.web.extension.HeaderFullExtension</class>
-	</extension>
 
 	<messages>
 		<lang>en</lang>
