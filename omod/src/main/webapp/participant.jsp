@@ -4,7 +4,15 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-
+		jQuery(".editMode").hide();
+		jQuery("#editButton").click(function(event) {
+			jQuery(".viewMode").hide();
+			jQuery(".editMode").show();
+		});
+		jQuery("#viewButton").click(function(event) {
+			jQuery(".editMode").hide();
+			jQuery(".viewMode").show();
+		});
 	});
 </script>
 
@@ -20,43 +28,107 @@
 <br/><br/>
 
 <table width="100%"><tr>
-	<td style="vertical-align:top; border:1px solid black; width:30%; padding:10px;">
-		<b>Participant Details</b><br/>
-		<table id="participantTable">
-			<tr>
-				<td>Participant ID:</td>
-				<td>
-					<c:forEach items="${patient.identifiers}" var="identifier">
-						${identifier}
-					</c:forEach>
-				</td>
-			</tr>
-			<tr>
-				<td>Name:</td>
-				<td>${patient.givenName} ${patient.familyName}</td>
-			</tr>
-			<tr>
-				<td>Gender:</td>
-				<td>${patient.gender}</td>
-			</tr>
-			<tr>
-				<td>Birthdate:</td>
-				<td>
-					<c:if test="${patient.birthdateEstimated}">~</c:if>
-					<openmrs:formatDate date="${patient.birthdate}" format="dd/MMM/yyyy"/>
-				</td>
-			</tr>
-		</table>
+	<td style="vertical-align:top; width:30%; padding:10px;">
+		<fieldset>
+			<legend><b>Participant Details</b></legend>
+			<form action="updateParticipant.form" method="post">
+				<input type="hidden" name="patientId" value="${patient.patientId}"/>
+				<table id="participantTable">
+					<tr>
+						<td>Participant ID:</td>
+						<td>
+							<c:set var="identifier" value=""/>
+							<c:forEach items="${patient.identifiers}" var="ident">
+								<c:set var="identifier" value="${ident}"/>
+							</c:forEach>
+							<span class="viewMode">${identifier}</span>
+							<span class="editMode">
+								<input type="text" name="identifier" value="${identifier}" size="20"/>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Given Name:</td>
+						<td>
+							<span class="viewMode">${patient.givenName}</span>
+							<span class="editMode">
+								<input type="text" name="givenName" value="${patient.givenName}" size="20"/>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Family Name:</td>
+						<td>
+							<span class="viewMode">${patient.familyName}</span>
+							<span class="editMode">
+								<input type="text" name="familyName" value="${patient.familyName}" size="20"/>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Gender:</td>
+						<td>
+							<span class="viewMode">${patient.gender}</span>
+							<span class="editMode">
+								<input type="radio" name="gender" value="M" ${patient.gender == 'M' ? "checked" : ""}/> Male
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="radio" name="gender" value="F" ${patient.gender == 'F' ? "checked" : ""}/> Female
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Birthdate:</td>
+						<td>
+							<span class="viewMode">
+								<c:if test="${patient.birthdateEstimated}">~</c:if>
+								<openmrs:formatDate date="${patient.birthdate}" format="dd/MMM/yyyy"/>
+							</span>
+							<span class="editMode">
+								<openmrs_tag:dateField formFieldName="birthdate" startValue="${patient.birthdate}"/>
+							</span>
+						</td>
+					</tr>
+				</table>
+				<br/>
+				<span class="viewMode">
+					<input type="button" id="editButton" value="Edit"/>
+				</span>
+				<span class="editMode">
+					<input type="submit" value="Save"/>
+					<input type="button" id="viewButton" value="Cancel"/>
+				</span>
+			</form>
+		</fieldset>
 		<br/>
-		<b>X-rays</b><br/>
-		<table id="xrayTable">
-			<tr>
-				<td>Participant ID:</td>
-				<td>
-					TODO
-				</td>
-			</tr>
-		</table>
+		<fieldset>
+			<legend><b>X-rays</b></legend>
+			<table id="xrayTable">
+				<tr>
+					<td>Enrollment X-ray:</td>
+					<td>
+						TODO
+					</td>
+				</tr>
+				<tr>
+					<td>Visit 9 X-ray:</td>
+					<td>
+						TODO
+					</td>
+				</tr>
+				<tr>
+					<td>Visit 13 X-ray:</td>
+					<td>
+						TODO
+					</td>
+				</tr>
+				<tr>
+					<td>Early termination X-ray:</td>
+					<td>
+						TODO
+					</td>
+				</tr>
+			</table>
+		</fieldset>
 	</td>
 	<td style="vertical-align:top; width:70%;">
 

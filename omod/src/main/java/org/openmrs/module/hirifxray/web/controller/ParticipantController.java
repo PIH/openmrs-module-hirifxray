@@ -71,4 +71,30 @@ public class ParticipantController {
 
 		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId();
 	}
+
+	@RequestMapping("/module/hirifxray/updateParticipant.form")
+	public String updateParticipant(ModelMap model,
+									@RequestParam(value="patientId", required=true) Integer patientId,
+									@RequestParam(value="identifier", required=true) String identifier,
+									@RequestParam(value="givenName", required=true) String givenName,
+									@RequestParam(value="familyName", required=true) String familyName,
+									@RequestParam(value="gender", required=true) String gender,
+									@RequestParam(value="birthdate", required=true) Date birthdate) {
+
+		Patient p = Context.getPatientService().getPatient(patientId);
+
+		PersonName pn = p.getPersonName();
+		pn.setGivenName(givenName);
+		pn.setFamilyName(familyName);
+
+		p.setGender(gender);
+		p.setBirthdate(birthdate);
+
+		PatientIdentifier pi = p.getPatientIdentifier();
+		pi.setIdentifier(identifier);
+
+		p = Context.getPatientService().savePatient(p);
+
+		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId();
+	}
 }

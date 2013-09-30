@@ -38,7 +38,7 @@
 						</span>
 						<br/><br/>
 						If you wish to save a new participant with this identifier, enter details below<br/><br/>
-						<form action="${pageContext.request.contextPath}/module/hirifxray/createParticipant.form">
+						<form method="post" action="${pageContext.request.contextPath}/module/hirifxray/createParticipant.form">
 							<b>Participant ID:</b><br/>
 							<input type="hidden" name="identifier" value="${identifier}"/>
 							${identifier}
