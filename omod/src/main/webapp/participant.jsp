@@ -151,6 +151,9 @@
 							</a>
 							<br/><br/>
 							<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}" height="350"/>
+							<div style="width:100%; text-align:right;">
+								<input type="button" onclick="if (confirm('Are you sure you wish to delete this x-ray?')) {document.location.href='deleteXray.form?patientId=${patient.patientId}&type=${type}&obsId=${xrays[type].id}';}" value="Delete X-ray">
+							</div>
 						</c:otherwise>
 					</c:choose>
 				</div>

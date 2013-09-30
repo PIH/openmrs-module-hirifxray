@@ -39,7 +39,7 @@ public class IndexController {
 					Pattern pattern = Pattern.compile(format);
 					Matcher matcher = pattern.matcher(identifier);
 					if (!matcher.matches()) {
-						model.addAttribute("invalidIdentifierFormat", format);
+						model.addAttribute("invalidIdentifierFormat", pit.getFormatDescription());
 					}
 				}
 			}

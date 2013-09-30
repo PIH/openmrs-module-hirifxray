@@ -150,4 +150,16 @@ public class ParticipantController {
 
 		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId() + "&type="+type;
 	}
+
+	@RequestMapping("/module/hirifxray/deleteXray.form")
+	public String deleteXray(ModelMap model,
+							 @RequestParam(value="patientId", required=true) Integer patientId,
+							 @RequestParam(value="type", required=true) String type,
+							 @RequestParam(value="obsId", required=true) Integer obsId) throws Exception {
+
+		Obs o = Context.getObsService().getObs(obsId);
+		Context.getObsService().voidObs(o, "Deleting xray");
+
+		return "redirect:/module/hirifxray/participant.form?id="+patientId + "&type="+type;
+	}
 }

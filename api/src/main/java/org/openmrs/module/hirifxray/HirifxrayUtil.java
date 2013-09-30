@@ -34,20 +34,12 @@ public class HirifxrayUtil {
 		return Context.getPatientService().getAllPatientIdentifierTypes().get(0);
 	}
 
-	public static Concept getXrayGroupConcept() {
-		return Context.getConceptService().getConcept("HIRIF X-ray construct");
-	}
-
-	public static Concept getXrayImageConcept() {
-		return Context.getConceptService().getConcept("HIRIF X-ray image");
-	}
-
-	public static Concept getXrayTypeConcept() {
-		return Context.getConceptService().getConcept("Type of HIRIF X-ray");
+	public static Concept getHirifConcept(String code) {
+		return Context.getConceptService().getConceptByMapping(code, "org.openmrs.module.hirifxray");
 	}
 
 	public static Concept getEnrollmentXrayConcept() {
-		return Context.getConceptService().getConcept("Enrollment X-ray");
+		return getHirifConcept("enrollmentXray");
 	}
 
 	public static Obs getEnrollmentXray(Patient p) {
@@ -59,7 +51,7 @@ public class HirifxrayUtil {
 	}
 
 	public static Concept getVisit9XrayConcept() {
-		return Context.getConceptService().getConcept("Visit 9 X-ray");
+		return getHirifConcept("visit9Xray");
 	}
 
 	public static Obs getVisit9Xray(Patient p) {
@@ -71,7 +63,7 @@ public class HirifxrayUtil {
 	}
 
 	public static Concept getVisit13XrayConcept() {
-		return Context.getConceptService().getConcept("Visit 13 X-ray");
+		return getHirifConcept("visit13Xray");
 	}
 
 	public static Obs getVisit13Xray(Patient p) {
@@ -83,7 +75,7 @@ public class HirifxrayUtil {
 	}
 
 	public static Concept getEarlyTerminationXrayConcept() {
-		return Context.getConceptService().getConcept("Early termination X-ray");
+		return getHirifConcept("earlyTerminationXray");
 	}
 
 	public static Obs getEarlyTerminationXray(Patient p) {
