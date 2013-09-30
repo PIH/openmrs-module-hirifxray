@@ -125,13 +125,15 @@
 		</fieldset>
 	</td>
 	<td style="vertical-align:top; width:70%;">
-		<fieldset>
-			<legend><b><spring:message code="hirifxray.${type}"/></b></legend>
-			<div style="height:300px;">
+		<c:if test="${!empty type}">
+			<fieldset>
+				<legend><b><spring:message code="hirifxray.${type}"/></b></legend>
+				<div style="height:300px;">
 
 
-			</div>
-		</fieldset>
+				</div>
+			</fieldset>
+		</c:if>
 	</td>
 </table>
 
