@@ -1,5 +1,6 @@
 package org.openmrs.module.hirifxray.web.controller;
 
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PersonName;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Controller
 public class ParticipantController {
@@ -30,7 +33,8 @@ public class ParticipantController {
     
     @RequestMapping("/module/hirifxray/participant.form")
     public String viewParticipant(ModelMap model,
-					   @RequestParam(value="id", required=true) Integer id) {
+					   @RequestParam(value="id", required=true) Integer id,
+					   @RequestParam(value="type", required=false) String type) {
 
 		User currentUser = Context.getAuthenticatedUser();
 		if (currentUser == null) {
@@ -39,6 +43,15 @@ public class ParticipantController {
 
 		Patient patient = Context.getPatientService().getPatient(id);
 		model.addAttribute("patient", patient);
+
+		Map<String, Obs> xrays = new LinkedHashMap<String, Obs>();
+		xrays.put("enrollmentXray", HirifxrayUtil.getEnrollmentXray(patient));
+		xrays.put("visit9Xray", HirifxrayUtil.getVisit9Xray(patient));
+		xrays.put("visit13Xray", HirifxrayUtil.getVisit13Xray(patient));
+		xrays.put("earlyTerminationXray", HirifxrayUtil.getEarlyTerminationXray(patient));
+		model.addAttribute("xrays", xrays);
+
+		model.addAttribute("type", type);
 
 		return null;
     }

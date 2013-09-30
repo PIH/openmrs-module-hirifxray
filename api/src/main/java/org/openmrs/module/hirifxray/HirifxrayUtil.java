@@ -15,8 +15,13 @@ package org.openmrs.module.hirifxray;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
+import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+
+import java.util.List;
 
 /**
  * Utility methods
@@ -27,5 +32,53 @@ public class HirifxrayUtil {
 
 	public static PatientIdentifierType getIdentifierType() {
 		return Context.getPatientService().getAllPatientIdentifierTypes().get(0);
+	}
+
+	public static Concept getEnrollmentXrayConcept() {
+		return Context.getConceptService().getConcept("Enrollment X-ray");
+	}
+
+	public static Obs getEnrollmentXray(Patient p) {
+		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getEnrollmentXrayConcept());
+		if (l == null || l.isEmpty()) {
+			return null;
+		}
+		return l.get(0);
+	}
+
+	public static Concept getVisit9XrayConcept() {
+		return Context.getConceptService().getConcept("Visit 9 X-ray");
+	}
+
+	public static Obs getVisit9Xray(Patient p) {
+		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getVisit9XrayConcept());
+		if (l == null || l.isEmpty()) {
+			return null;
+		}
+		return l.get(0);
+	}
+
+	public static Concept getVisit13XrayConcept() {
+		return Context.getConceptService().getConcept("Visit 13 X-ray");
+	}
+
+	public static Obs getVisit13Xray(Patient p) {
+		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getVisit13XrayConcept());
+		if (l == null || l.isEmpty()) {
+			return null;
+		}
+		return l.get(0);
+	}
+
+	public static Concept getEarlyTerminationXrayConcept() {
+		return Context.getConceptService().getConcept("Early termination X-ray");
+	}
+
+	public static Obs getEarlyTerminationXray(Patient p) {
+		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getEarlyTerminationXrayConcept());
+		if (l == null || l.isEmpty()) {
+			return null;
+		}
+		return l.get(0);
 	}
 }

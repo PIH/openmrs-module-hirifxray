@@ -18,6 +18,7 @@
 
 <style>
 	#participantTable td {padding-right:10px;}
+	#xrayTable td {padding-right:10px;}
 </style>
 
 <h3>
@@ -28,7 +29,7 @@
 <br/><br/>
 
 <table width="100%"><tr>
-	<td style="vertical-align:top; width:30%; padding:10px;">
+	<td style="vertical-align:top; width:30%;">
 		<fieldset>
 			<legend><b>Participant Details</b></legend>
 			<form action="updateParticipant.form" method="post">
@@ -43,7 +44,7 @@
 							</c:forEach>
 							<span class="viewMode">${identifier}</span>
 							<span class="editMode">
-								<input type="text" name="identifier" value="${identifier}" size="20"/>
+								<input type="text" name="identifier" value="${identifier}" size="25"/>
 							</span>
 						</td>
 					</tr>
@@ -52,7 +53,7 @@
 						<td>
 							<span class="viewMode">${patient.givenName}</span>
 							<span class="editMode">
-								<input type="text" name="givenName" value="${patient.givenName}" size="20"/>
+								<input type="text" name="givenName" value="${patient.givenName}" size="25"/>
 							</span>
 						</td>
 					</tr>
@@ -61,7 +62,7 @@
 						<td>
 							<span class="viewMode">${patient.familyName}</span>
 							<span class="editMode">
-								<input type="text" name="familyName" value="${patient.familyName}" size="20"/>
+								<input type="text" name="familyName" value="${patient.familyName}" size="25"/>
 							</span>
 						</td>
 					</tr>
@@ -103,35 +104,34 @@
 		<fieldset>
 			<legend><b>X-rays</b></legend>
 			<table id="xrayTable">
-				<tr>
-					<td>Enrollment X-ray:</td>
-					<td>
-						TODO
-					</td>
-				</tr>
-				<tr>
-					<td>Visit 9 X-ray:</td>
-					<td>
-						TODO
-					</td>
-				</tr>
-				<tr>
-					<td>Visit 13 X-ray:</td>
-					<td>
-						TODO
-					</td>
-				</tr>
-				<tr>
-					<td>Early termination X-ray:</td>
-					<td>
-						TODO
-					</td>
-				</tr>
+				<c:forEach items="${xrays}" var="xrayEntry">
+					<tr style="${type == xrayEntry.key ? 'background-color:lightgrey;' : ''}">
+						<td><spring:message code="hirifxray.${xrayEntry.key}"/>:</td>
+						<td>
+							<a href="participant.form?id=${patient.patientId}&type=${xrayEntry.key}">
+								<c:choose>
+									<c:when test="${empty xrayEntry.value}">
+										Add
+									</c:when>
+									<c:otherwise>
+										<openmrs:formatDate date="${xrayEntry.value.obsDatetime}" format="dd/MMM/yyyy"/>
+									</c:otherwise>
+								</c:choose>
+							</a>
+						</td>
+					</tr>
+				</c:forEach>
 			</table>
 		</fieldset>
 	</td>
 	<td style="vertical-align:top; width:70%;">
+		<fieldset>
+			<legend><b><spring:message code="hirifxray.${type}"/></b></legend>
+			<div style="height:300px;">
 
+
+			</div>
+		</fieldset>
 	</td>
 </table>
 
