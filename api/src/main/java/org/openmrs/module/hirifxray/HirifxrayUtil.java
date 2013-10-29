@@ -16,6 +16,7 @@ package org.openmrs.module.hirifxray;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
@@ -84,5 +85,9 @@ public class HirifxrayUtil {
 			return null;
 		}
 		return l.get(0);
+	}
+
+	public static Location getUnknownLocation() {
+		return Context.getLocationService().getLocation("Unknown Location");
 	}
 }

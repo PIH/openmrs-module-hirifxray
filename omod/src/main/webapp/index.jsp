@@ -43,19 +43,10 @@
 							<input type="hidden" name="identifier" value="${identifier}"/>
 							${identifier}
 							<br/><br/>
-							<b>Given Name:</b><br/>
-							<input type="text" name="givenName" size="30"/>
-							<br/><br/>
-							<b>Family Name:</b><br/>
-							<input type="text" name="familyName" size="30"/>
-							<br/><br/>
 							<b>Gender</b><br/>
 							<input type="radio" name="gender" value="M"/> Male
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<input type="radio" name="gender" value="F"/> Female
-							<br/><br/>
-							<b>Birth Date</b><br/>
-							<openmrs_tag:dateField formFieldName="birthdate" startValue=""/>
 							<br/><br/>
 							<input type="submit" value="Create Participant"/>
 						</form>
@@ -69,7 +60,6 @@
 								<c:forEach items="${p.identifiers}" var="identifier">
 									<b>${identifier}</b><br/>
 								</c:forEach>
-								${p.givenName} ${p.familyName}
 							</td>
 							<td>
 								<button style="width:100px; height: 50px;" onclick="document.location.href='module/hirifxray/participant.form?id=${p.patientId}';">

@@ -49,24 +49,6 @@
 						</td>
 					</tr>
 					<tr>
-						<td>Given Name:</td>
-						<td>
-							<span class="viewMode">${patient.givenName}</span>
-							<span class="editMode">
-								<input type="text" name="givenName" value="${patient.givenName}" size="25"/>
-							</span>
-						</td>
-					</tr>
-					<tr>
-						<td>Family Name:</td>
-						<td>
-							<span class="viewMode">${patient.familyName}</span>
-							<span class="editMode">
-								<input type="text" name="familyName" value="${patient.familyName}" size="25"/>
-							</span>
-						</td>
-					</tr>
-					<tr>
 						<td>Gender:</td>
 						<td>
 							<span class="viewMode">${patient.gender}</span>
@@ -74,18 +56,6 @@
 								<input type="radio" name="gender" value="M" ${patient.gender == 'M' ? "checked" : ""}/> Male
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								<input type="radio" name="gender" value="F" ${patient.gender == 'F' ? "checked" : ""}/> Female
-							</span>
-						</td>
-					</tr>
-					<tr>
-						<td>Birthdate:</td>
-						<td>
-							<span class="viewMode">
-								<c:if test="${patient.birthdateEstimated}">~</c:if>
-								<openmrs:formatDate date="${patient.birthdate}" format="dd/MMM/yyyy"/>
-							</span>
-							<span class="editMode">
-								<openmrs_tag:dateField formFieldName="birthdate" startValue="${patient.birthdate}"/>
 							</span>
 						</td>
 					</tr>

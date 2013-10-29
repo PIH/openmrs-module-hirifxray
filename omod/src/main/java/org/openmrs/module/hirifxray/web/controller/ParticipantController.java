@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -72,23 +72,23 @@ public class ParticipantController {
 	@RequestMapping("/module/hirifxray/createParticipant.form")
 	public String createParticipant(ModelMap model,
 					   @RequestParam(value="identifier", required=true) String identifier,
-					   @RequestParam(value="givenName", required=true) String givenName,
-					   @RequestParam(value="familyName", required=true) String familyName,
-					   @RequestParam(value="gender", required=true) String gender,
-					   @RequestParam(value="birthdate", required=true) Date birthdate) {
+					   @RequestParam(value="gender", required=true) String gender) throws Exception {
 
 		Patient p = new Patient();
 
 		PersonName pn = new PersonName();
-		pn.setGivenName(givenName);
-		pn.setFamilyName(familyName);
+		pn.setGivenName("XXXX");
+		pn.setFamilyName("XXXX");
 		p.addName(pn);
 
 		p.setGender(gender);
-		p.setBirthdate(birthdate);
+
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		p.setBirthdate(df.parse("1900-01-01"));
 
 		PatientIdentifier pi = new PatientIdentifier();
 		pi.setPatient(p);
+		pi.setLocation(HirifxrayUtil.getUnknownLocation());
 		pi.setIdentifierType(HirifxrayUtil.getIdentifierType());
 		pi.setIdentifier(identifier);
 		p.addIdentifier(pi);
@@ -102,19 +102,10 @@ public class ParticipantController {
 	public String updateParticipant(ModelMap model,
 									@RequestParam(value="patientId", required=true) Integer patientId,
 									@RequestParam(value="identifier", required=true) String identifier,
-									@RequestParam(value="givenName", required=true) String givenName,
-									@RequestParam(value="familyName", required=true) String familyName,
-									@RequestParam(value="gender", required=true) String gender,
-									@RequestParam(value="birthdate", required=true) Date birthdate) {
+									@RequestParam(value="gender", required=true) String gender) {
 
 		Patient p = Context.getPatientService().getPatient(patientId);
-
-		PersonName pn = p.getPersonName();
-		pn.setGivenName(givenName);
-		pn.setFamilyName(familyName);
-
 		p.setGender(gender);
-		p.setBirthdate(birthdate);
 
 		PatientIdentifier pi = p.getPatientIdentifier();
 		pi.setIdentifier(identifier);
