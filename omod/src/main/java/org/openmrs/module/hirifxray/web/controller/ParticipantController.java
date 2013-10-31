@@ -24,6 +24,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -50,21 +51,33 @@ public class ParticipantController {
 		Patient patient = Context.getPatientService().getPatient(id);
 		model.addAttribute("patient", patient);
 
+		String[] xrayTypes = {"enrollment", "visit9", "visit13", "earlyTermination"};
+
 		Map<String, Concept> xraysConcepts = new LinkedHashMap<String, Concept>();
-		xraysConcepts.put("enrollmentXray", HirifxrayUtil.getEnrollmentXrayConcept());
-		xraysConcepts.put("visit9Xray", HirifxrayUtil.getVisit9XrayConcept());
-		xraysConcepts.put("visit13Xray", HirifxrayUtil.getVisit13XrayConcept());
-		xraysConcepts.put("earlyTerminationXray", HirifxrayUtil.getEarlyTerminationXrayConcept());
-		model.addAttribute("xraysConcepts", xraysConcepts);
-
 		Map<String, Obs> xrays = new LinkedHashMap<String, Obs>();
-		xrays.put("enrollmentXray", HirifxrayUtil.getEnrollmentXray(patient));
-		xrays.put("visit9Xray", HirifxrayUtil.getVisit9Xray(patient));
-		xrays.put("visit13Xray", HirifxrayUtil.getVisit13Xray(patient));
-		xrays.put("earlyTerminationXray", HirifxrayUtil.getEarlyTerminationXray(patient));
-		model.addAttribute("xrays", xrays);
+		Map<String, Concept> xrayStatusConcepts = new LinkedHashMap<String, Concept>();
+		Map<String, Obs> xrayStatuses = new LinkedHashMap<String, Obs>();
 
+		for (String xrayType : xrayTypes) {
+			String xrayCode = xrayType + "Xray";
+			Concept xrayConcept = HirifxrayUtil.getHirifConcept(xrayCode);
+			xraysConcepts.put(xrayType, xrayConcept);
+			xrays.put(xrayType, HirifxrayUtil.getHirifObs(patient, xrayConcept));
+
+			String xrayStatusCode = xrayCode + "Status";
+			Concept xrayStatusConcept = HirifxrayUtil.getHirifConcept(xrayStatusCode);
+			xrayStatusConcepts.put(xrayType, xrayStatusConcept);
+			xrayStatuses.put(xrayType, HirifxrayUtil.getHirifObs(patient, xrayStatusConcept));
+		}
+
+		model.addAttribute("xrayTypes", xrayTypes);
+		model.addAttribute("xraysConcepts", xraysConcepts);
+		model.addAttribute("xrays", xrays);
+		model.addAttribute("xrayStatusConcepts", xrayStatusConcepts);
+		model.addAttribute("xrayStatuses", xrayStatuses);
 		model.addAttribute("type", type);
+		model.addAttribute("notDoneConcept", HirifxrayUtil.getXrayNotDoneConcept());
+		model.addAttribute("completedConcept", HirifxrayUtil.getXrayCompletedConcept());
 
 		return null;
     }
@@ -119,25 +132,45 @@ public class ParticipantController {
 	public String uploadXray(ModelMap model,
 							 @RequestParam(value="patientId", required=true) Integer patientId,
 							 @RequestParam(value="type", required=true) String type,
+							 @RequestParam(value="statusQuestion", required=true) Concept statusQuestion,
+							 @RequestParam(value="statusAnswer", required=false) Concept statusAnswer,
 							 @RequestParam(value="concept", required=true) Concept concept,
-							 @RequestParam(value="obsDatetime", required=true) Date obsDatetime,
-							 @RequestParam(value="xrayFile", required=true) MultipartFile xrayFile) throws Exception {
+							 @RequestParam(value="obsDatetime", required=false) Date obsDatetime,
+							 @RequestParam(value="xrayFile", required=false) MultipartFile xrayFile) throws Exception {
 
 		Patient p = Context.getPatientService().getPatient(patientId);
-		Obs o = new Obs();
-		o.setPerson(p);
-		o.setObsDatetime(obsDatetime);
-		o.setConcept(concept);
 
-		String identifier = p.getPatientIdentifier().getIdentifier();
+		if (statusAnswer != null) {
+			Obs o = new Obs();
+			o.setPerson(p);
+			o.setObsDatetime(obsDatetime == null ? new Date() : obsDatetime);
+			o.setConcept(statusQuestion);
+			o.setValueCoded(statusAnswer);
+			Context.getObsService().saveObs(o, "Saved status for " + type);
+		}
+		else {
+			List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, statusQuestion);
+			for (Obs o : l) {
+				Context.getObsService().voidObs(o, "Voided.");
+			}
+		}
 
-		String[] fileParts = xrayFile.getOriginalFilename().split("\\.");
-		String xrayKey = identifier + "_" + type + "." + fileParts[fileParts.length-1];
+		if (xrayFile != null && !xrayFile.isEmpty()) {
+			Obs o = new Obs();
+			o.setPerson(p);
+			o.setObsDatetime(obsDatetime);
+			o.setConcept(concept);
 
-		ComplexData data = new ComplexData(xrayKey, xrayFile.getInputStream());
-		o.setComplexData(data);
+			String identifier = p.getPatientIdentifier().getIdentifier();
 
-		Context.getObsService().saveObs(o, "Uploading " + type);
+			String[] fileParts = xrayFile.getOriginalFilename().split("\\.");
+			String xrayKey = identifier + "_" + type + "." + fileParts[fileParts.length-1];
+
+			ComplexData data = new ComplexData(xrayKey, xrayFile.getInputStream());
+			o.setComplexData(data);
+
+			Context.getObsService().saveObs(o, "Uploaded image for " + type);
+		}
 
 		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId() + "&type="+type;
 	}

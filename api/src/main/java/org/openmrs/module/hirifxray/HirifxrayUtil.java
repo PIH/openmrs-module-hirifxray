@@ -39,52 +39,20 @@ public class HirifxrayUtil {
 		return Context.getConceptService().getConceptByMapping(code, "org.openmrs.module.hirifxray");
 	}
 
-	public static Concept getEnrollmentXrayConcept() {
-		return getHirifConcept("enrollmentXray");
-	}
-
-	public static Obs getEnrollmentXray(Patient p) {
-		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getEnrollmentXrayConcept());
+	public static Obs getHirifObs(Patient p, Concept c) {
+		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, c);
 		if (l == null || l.isEmpty()) {
 			return null;
 		}
 		return l.get(0);
 	}
 
-	public static Concept getVisit9XrayConcept() {
-		return getHirifConcept("visit9Xray");
+	public static Concept getXrayNotDoneConcept() {
+		return getHirifConcept("notDone");
 	}
 
-	public static Obs getVisit9Xray(Patient p) {
-		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getVisit9XrayConcept());
-		if (l == null || l.isEmpty()) {
-			return null;
-		}
-		return l.get(0);
-	}
-
-	public static Concept getVisit13XrayConcept() {
-		return getHirifConcept("visit13Xray");
-	}
-
-	public static Obs getVisit13Xray(Patient p) {
-		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getVisit13XrayConcept());
-		if (l == null || l.isEmpty()) {
-			return null;
-		}
-		return l.get(0);
-	}
-
-	public static Concept getEarlyTerminationXrayConcept() {
-		return getHirifConcept("earlyTerminationXray");
-	}
-
-	public static Obs getEarlyTerminationXray(Patient p) {
-		List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, getEarlyTerminationXrayConcept());
-		if (l == null || l.isEmpty()) {
-			return null;
-		}
-		return l.get(0);
+	public static Concept getXrayCompletedConcept() {
+		return getHirifConcept("completed");
 	}
 
 	public static Location getUnknownLocation() {

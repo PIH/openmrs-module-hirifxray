@@ -13,6 +13,14 @@
 			jQuery(".editMode").hide();
 			jQuery(".viewMode").show();
 		});
+		jQuery("#notDoneField").click(function(event) {
+			if (jQuery(this).attr("checked")) {
+				jQuery("#xrayDetailSection").hide();
+			}
+			else {
+				jQuery("#xrayDetailSection").show();
+			}
+		});
 	});
 </script>
 
@@ -74,17 +82,30 @@
 		<fieldset>
 			<legend><b>X-rays</b></legend>
 			<table id="xrayTable">
-				<c:forEach items="${xrays}" var="xrayEntry">
-					<tr style="${type == xrayEntry.key ? 'background-color:lightgrey;' : ''}">
-						<td><spring:message code="hirifxray.${xrayEntry.key}"/>:</td>
+
+				<c:forEach items="${xrayTypes}" var="xrayType">
+
+					<c:set var="xrayConcept" value="${xrayConcepts[xrayType]}"/>
+					<c:set var="xray" value="${xrays[xrayType]}"/>
+					<c:set var="xrayStatusConcept" value="${xrayStatusConcepts[xrayType]}"/>
+					<c:set var="xrayStatus" value="${xrayStatuses[xrayType]}"/>
+
+					<tr style="${type == xrayType ? 'background-color:lightgrey;' : ''}">
+						<td><spring:message code="hirifxray.${xrayType}Xray"/>:</td>
 						<td>
-							<a href="participant.form?id=${patient.patientId}&type=${xrayEntry.key}">
+							<a href="participant.form?id=${patient.patientId}&type=${xrayType}">
 								<c:choose>
-									<c:when test="${empty xrayEntry.value}">
+									<c:when test="${empty xray && empty xrayStatus}">
 										Add
 									</c:when>
+									<c:when test="${empty xray}">
+										<c:choose>
+											<c:when test="${xrayStatus.valueCoded == notDoneConcept}">X-ray never done</c:when>
+											<c:otherwise>X-ray completed</c:otherwise>
+										</c:choose>
+									</c:when>
 									<c:otherwise>
-										<openmrs:formatDate date="${xrayEntry.value.obsDatetime}" format="dd/MMM/yyyy"/>
+										<openmrs:formatDate date="${xray.obsDatetime}" format="dd/MMM/yyyy"/>
 									</c:otherwise>
 								</c:choose>
 							</a>
@@ -97,35 +118,45 @@
 	<td style="vertical-align:top; width:70%;">
 		<c:if test="${!empty type}">
 			<fieldset>
-				<legend><b><spring:message code="hirifxray.${type}"/></b></legend>
-				<div style="height:400px; padding:10px;">
-					<c:choose>
-						<c:when test="${empty xrays[type]}">
-							<form action="uploadXray.form" method="post" enctype="multipart/form-data">
-								<input type="hidden" name="patientId" value="${patient.patientId}"/>
-								<input type="hidden" name="type" value="${type}"/>
-								<input type="hidden" name="concept" value="${xraysConcepts[type].conceptId}"/>
-								<br/>
-								<b>Date of x-ray:</b><br/>
-								<openmrs_tag:dateField formFieldName="obsDatetime" startValue=""/>
-								<br/><br/>
-								<b>Image to upload:</b><br/>
-								<input type="file" name="xrayFile" size="50"/>
-								<br/><br/>
-								<input type="submit" value="Upload x-ray"/>
-							</form>
-						</c:when>
-						<c:otherwise>
-							<a href="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}&view=download&viewType=download">
-								Download Full Image
-							</a>
+				<legend><b><spring:message code="hirifxray.${type}Xray"/></b></legend>
+				<div style="height:460px; padding:10px;">
+
+					<form action="uploadXray.form" method="post" enctype="multipart/form-data">
+						<input type="hidden" name="patientId" value="${patient.patientId}"/>
+						<input type="hidden" name="type" value="${type}"/>
+						<input type="hidden" name="concept" value="${xraysConcepts[type].conceptId}"/>
+						<input type="hidden" name="statusQuestion" value="${xrayStatusConcepts[type].conceptId}"/>
+
+						<c:if test="${empty xrays[type]}">
+							<input id="notDoneField" type="checkbox" name="statusAnswer" value="${notDoneConcept.conceptId}" <c:if test="${xrayStatuses[type].valueCoded == notDoneConcept}">checked</c:if>/>X-ray never done
 							<br/><br/>
-							<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}" height="350"/>
-							<div style="width:100%; text-align:right;">
-								<input type="button" onclick="if (confirm('Are you sure you wish to delete this x-ray?')) {document.location.href='deleteXray.form?patientId=${patient.patientId}&type=${type}&obsId=${xrays[type].id}';}" value="Delete X-ray">
-							</div>
-						</c:otherwise>
-					</c:choose>
+						</c:if>
+
+						<div id="xrayDetailSection" <c:if test="${xrayStatuses[type].valueCoded == notDoneConcept}">style="display:none;"</c:if>>
+							<c:choose>
+								<c:when test="${empty xrays[type]}">
+									<b>Date of x-ray:</b><br/>
+									<openmrs_tag:dateField formFieldName="obsDatetime" startValue=""/>
+									<br/><br/>
+									<b>Image to upload:</b><br/>
+									<input type="file" name="xrayFile" size="50"/>
+									<br/><br/>
+								</c:when>
+								<c:otherwise>
+									<b><openmrs:formatDate date="${xrays[type].obsDatetime}"/></b>&nbsp;&nbsp;&nbsp;
+									<a href="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}&view=download&viewType=download">
+										Download Full Image
+									</a>
+									<br/><br/>
+									<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}" height="350"/>
+									<div style="width:100%; text-align:right;">
+										<input type="button" onclick="if (confirm('Are you sure you wish to delete this x-ray?')) {document.location.href='deleteXray.form?patientId=${patient.patientId}&type=${type}&obsId=${xrays[type].id}';}" value="Delete X-ray">
+									</div>
+								</c:otherwise>
+							</c:choose>
+						</div>
+						<input type="submit" value="Save"/>
+					</form>
 				</div>
 			</fieldset>
 		</c:if>
