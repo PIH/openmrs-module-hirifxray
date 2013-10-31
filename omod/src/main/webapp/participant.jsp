@@ -37,7 +37,7 @@
 <br/><br/>
 
 <table width="100%"><tr>
-	<td style="vertical-align:top; width:30%;">
+	<td style="vertical-align:top; width:35%;">
 		<fieldset>
 			<legend><b><spring:message code="hirifxray.participantDetails"/></b></legend>
 			<form action="updateParticipant.form" method="post">
@@ -115,7 +115,7 @@
 			</table>
 		</fieldset>
 	</td>
-	<td style="vertical-align:top; width:70%;">
+	<td style="vertical-align:top; width:65%;">
 		<c:if test="${!empty type}">
 			<fieldset>
 				<legend><b><spring:message code="hirifxray.${type}Xray"/></b></legend>
