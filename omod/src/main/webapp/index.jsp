@@ -12,43 +12,43 @@
 </script>
 
 <h3>
-	HiRif Study X-ray Management System
+	<spring:message code="hirifxray.title"/>
 </h3>
 <br/>
 <table width="100%">
 	<tr>
 		<td>
 			<form method="get">
-				Enter Participant ID:
+				<spring:message code="hirifxray.enterParticipantId"/>:
 				<input type="text" size="20" id="participantLookup" name="identifier"/>
-				<input type="submit"/>
-				<input type="button" value="Clear" id="clearButton"/>
+				<input type="submit" value="<spring:message code="hirifxray.submit"/>"/>
+				<input type="button" value="<spring:message code="hirifxray.clear"/>" id="clearButton"/>
 			</form>
 			<hr/>
 			<c:if test="${patients != null}">
 				<c:choose>
 					<c:when test="${!empty invalidIdentifierFormat}">
 						<span style="font-weight:bold; color:red">
-							Invalid identifier supplied.  Expected format is ${invalidIdentifierFormat}
+							<spring:message code="hirifxray.invalidIdentifier"/> ${invalidIdentifierFormat}
 						</span>
 					</c:when>
 					<c:when test="${fn:length(patients) == 0}">
 						<span style="font-weight:bold; color:red">
-							No matching participants found.
+							<spring:message code="hirifxray.noMatchingParticipants"/>.
 						</span>
 						<br/><br/>
-						If you wish to save a new participant with this identifier, enter details below<br/><br/>
+						<spring:message code="hirifxray.ifWishToSaveEnterDetails"/><br/><br/>
 						<form method="post" action="${pageContext.request.contextPath}/module/hirifxray/createParticipant.form">
-							<b>Participant ID:</b><br/>
+							<b><spring:message code="hirifxray.participantId"/>:</b><br/>
 							<input type="hidden" name="identifier" value="${identifier}"/>
 							${identifier}
 							<br/><br/>
-							<b>Gender</b><br/>
-							<input type="radio" name="gender" value="M"/> Male
+							<b><spring:message code="hirifxray.gender"/></b><br/>
+							<input type="radio" name="gender" value="M"/> <spring:message code="hirifxray.gender.M"/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<input type="radio" name="gender" value="F"/> Female
+							<input type="radio" name="gender" value="F"/> <spring:message code="hirifxray.gender.F"/>
 							<br/><br/>
-							<input type="submit" value="Create Participant"/>
+							<input type="submit" value="<spring:message code="hirifxray.createParticipant"/>"/>
 						</form>
 					</c:when>
 					<c:otherwise></c:otherwise>
@@ -63,7 +63,7 @@
 							</td>
 							<td>
 								<button style="width:100px; height: 50px;" onclick="document.location.href='module/hirifxray/participant.form?id=${p.patientId}';">
-									Open
+									<spring:message code="hirifxray.open"/>
 								</button>
 							</td>
 						</tr>
