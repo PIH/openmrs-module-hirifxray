@@ -37,7 +37,7 @@
 <br/><br/>
 
 <table width="100%"><tr>
-	<td style="vertical-align:top; width:35%;">
+	<td style="vertical-align:top; width:50%;">
 		<fieldset>
 			<legend><b><spring:message code="hirifxray.participantDetails"/></b></legend>
 			<form action="updateParticipant.form" method="post">
@@ -59,7 +59,11 @@
 					<tr>
 						<td><spring:message code="hirifxray.gender"/>:</td>
 						<td>
-							<span class="viewMode">${patient.gender}</span>
+							<span class="viewMode">
+								<c:if test="${!empty patient.gender}">
+									<spring:message code="hirifxray.gender.${patient.gender}"/>
+								</c:if>
+							</span>
 							<span class="editMode">
 								<input type="radio" name="gender" value="M" ${patient.gender == 'M' ? "checked" : ""}/> <spring:message code="hirifxray.gender.M"/>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -115,7 +119,7 @@
 			</table>
 		</fieldset>
 	</td>
-	<td style="vertical-align:top; width:65%;">
+	<td style="vertical-align:top; width:50%;">
 		<c:if test="${!empty type}">
 			<fieldset>
 				<legend><b><spring:message code="hirifxray.${type}Xray"/></b></legend>
@@ -126,7 +130,7 @@
 						<input type="hidden" name="type" value="${type}"/>
 						<input type="hidden" name="concept" value="${xraysConcepts[type].conceptId}"/>
 						<input type="hidden" name="statusQuestion" value="${xrayStatusConcepts[type].conceptId}"/>
-
+						<c:set var="showSave" value="true"/>
 						<c:if test="${empty xrays[type]}">
 							<input id="notDoneField" type="checkbox" name="statusAnswer" value="${notDoneConcept.conceptId}" <c:if test="${xrayStatuses[type].valueCoded == notDoneConcept}">checked</c:if>/><spring:message code="hirifxray.neverDone"/>
 							<br/><br/>
@@ -143,7 +147,8 @@
 									<br/><br/>
 								</c:when>
 								<c:otherwise>
-									<b><openmrs:formatDate date="${xrays[type].obsDatetime}"/></b>&nbsp;&nbsp;&nbsp;
+									<c:set var="showSave" value="false"/>
+									<b><openmrs:formatDate date="${xrays[type].obsDatetime}" format="dd/MMM/yyyy"/></b>&nbsp;&nbsp;&nbsp;
 									<a href="${pageContext.request.contextPath}/complexObsServlet?obsId=${xrays[type].id}&view=download&viewType=download">
 										<spring:message code="hirifxray.downloadFullImage"/>
 									</a>
@@ -155,7 +160,9 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-						<input type="submit" value="<spring:message code="hirifxray.save"/>"/>
+						<c:if test="${showSave}">
+							<input type="submit" value="<spring:message code="hirifxray.save"/>"/>
+						</c:if>
 					</form>
 				</div>
 			</fieldset>
