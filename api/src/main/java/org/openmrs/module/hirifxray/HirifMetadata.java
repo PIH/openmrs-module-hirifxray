@@ -27,7 +27,6 @@ public class HirifMetadata {
 	// Concept Mapping Code Constants
 
 	public static String HIRIF_SOURCE_NAME = "org.openmrs.module.hirifxray";
-	public static String XRAY_CONSTRUCT = "xrayConstruct";
 	public static String XRAY_STATUS = "xrayStatus";
 	public static String XRAY_STATUS_COMPLETED = "completed";
 	public static String XRAY_STATUS_NOT_DONE = "notDone";
@@ -41,10 +40,6 @@ public class HirifMetadata {
 	public static String XRAY_LOCATION_POSTERIOR_ANTERIOR = "posteriorAnterior";
 	public static String XRAY_LOCATION_LEFT_LATERAL = "leftLateral";
 	public static String XRAY_LOCATION_RIGHT_LATERAL = "rightLateral";
-
-	public static Concept getXrayConstruct() {
-		return lookupConcept(XRAY_CONSTRUCT);
-	}
 
 	public static Concept getXrayStatusConcept() {
 		return lookupConcept(XRAY_STATUS);
