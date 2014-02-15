@@ -41,7 +41,7 @@
 <br/><br/>
 
 <table width="100%"><tr>
-	<td style="vertical-align:top; width:25%;">
+	<td style="vertical-align:top; width:35%;">
 		<fieldset>
 			<legend><b><spring:message code="hirifxray.participantDetails"/></b></legend>
 			<form action="updateParticipant.form" method="post">
@@ -179,7 +179,7 @@
 									<spring:message code="hirifxray.downloadFullImage"/>
 								</a>
 								<br/><br/>
-								<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xray.imageObs.obsId}" height="350"/>
+								<img src="${pageContext.request.contextPath}/complexObsServlet?obsId=${xray.imageObs.obsId}" height="450"/>
 							</c:if>
 						</c:otherwise>
 					</c:choose>
