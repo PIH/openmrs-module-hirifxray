@@ -5,13 +5,12 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hirifxray.HirifxrayUtil;
+import org.openmrs.module.hirifxray.HirifMetadata;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +32,7 @@ public class IndexController {
 			model.addAttribute("patients", patients);
 
 			if (patients.isEmpty()) {
-				PatientIdentifierType pit = HirifxrayUtil.getIdentifierType();
+				PatientIdentifierType pit = HirifMetadata.getIdentifierType();
 				String format = pit.getFormat();
 				if (StringUtils.isNotEmpty(format)) {
 					Pattern pattern = Pattern.compile(format);

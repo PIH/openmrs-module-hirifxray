@@ -1,15 +1,20 @@
 package org.openmrs.module.hirifxray.web.controller;
 
 import org.openmrs.Concept;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PersonName;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hirifxray.HirifxrayUtil;
+import org.openmrs.module.hirifxray.HirifMetadata;
+import org.openmrs.module.hirifxray.HirifUtil;
+import org.openmrs.module.hirifxray.Xray;
 import org.openmrs.obs.ComplexData;
 import org.openmrs.propertyeditor.ConceptEditor;
+import org.openmrs.propertyeditor.EncounterEditor;
+import org.openmrs.propertyeditor.PatientEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,9 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class ParticipantController {
@@ -36,48 +38,37 @@ public class ParticipantController {
 		dateFormat.setLenient(false);
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat,true, 10));
 		binder.registerCustomEditor(Concept.class, new ConceptEditor());
+		binder.registerCustomEditor(Patient.class, new PatientEditor());
+		binder.registerCustomEditor(Encounter.class, new EncounterEditor());
 	}
     
     @RequestMapping("/module/hirifxray/participant.form")
     public String viewParticipant(ModelMap model,
 					   @RequestParam(value="id", required=true) Integer id,
-					   @RequestParam(value="type", required=false) String type) {
+					   @RequestParam(value="type", required=false) Concept type,
+					   @RequestParam(value="xrayId", required=false) Encounter encounter) {
 
 		User currentUser = Context.getAuthenticatedUser();
 		if (currentUser == null) {
 			return "redirect:/login.htm";
 		}
 
+		Xray xray = new Xray(encounter);
+
+		model.addAttribute("type", type);
+		model.addAttribute("xray", xray);
+
 		Patient patient = Context.getPatientService().getPatient(id);
 		model.addAttribute("patient", patient);
 
-		String[] xrayTypes = {"enrollment", "visit9", "visit13", "earlyTermination"};
+		model.addAttribute("xrayTypes", HirifMetadata.getXrayTypes());
+		model.addAttribute("xraysByType", HirifUtil.getXraysByType(patient));
 
-		Map<String, Concept> xraysConcepts = new LinkedHashMap<String, Concept>();
-		Map<String, Obs> xrays = new LinkedHashMap<String, Obs>();
-		Map<String, Concept> xrayStatusConcepts = new LinkedHashMap<String, Concept>();
-		Map<String, Obs> xrayStatuses = new LinkedHashMap<String, Obs>();
+		model.addAttribute("xrayLocations", HirifMetadata.getXrayLocations());
 
-		for (String xrayType : xrayTypes) {
-			String xrayCode = xrayType + "Xray";
-			Concept xrayConcept = HirifxrayUtil.getHirifConcept(xrayCode);
-			xraysConcepts.put(xrayType, xrayConcept);
-			xrays.put(xrayType, HirifxrayUtil.getHirifObs(patient, xrayConcept));
-
-			String xrayStatusCode = xrayCode + "Status";
-			Concept xrayStatusConcept = HirifxrayUtil.getHirifConcept(xrayStatusCode);
-			xrayStatusConcepts.put(xrayType, xrayStatusConcept);
-			xrayStatuses.put(xrayType, HirifxrayUtil.getHirifObs(patient, xrayStatusConcept));
-		}
-
-		model.addAttribute("xrayTypes", xrayTypes);
-		model.addAttribute("xraysConcepts", xraysConcepts);
-		model.addAttribute("xrays", xrays);
-		model.addAttribute("xrayStatusConcepts", xrayStatusConcepts);
-		model.addAttribute("xrayStatuses", xrayStatuses);
-		model.addAttribute("type", type);
-		model.addAttribute("notDoneConcept", HirifxrayUtil.getXrayNotDoneConcept());
-		model.addAttribute("completedConcept", HirifxrayUtil.getXrayCompletedConcept());
+		model.addAttribute("xrayStatuses", HirifMetadata.getXrayStatuses());
+		model.addAttribute("notDoneStatus", HirifMetadata.getNotDoneStatus());
+		model.addAttribute("completedStatus", HirifMetadata.getCompletedStatus());
 
 		return null;
     }
@@ -101,8 +92,8 @@ public class ParticipantController {
 
 		PatientIdentifier pi = new PatientIdentifier();
 		pi.setPatient(p);
-		pi.setLocation(HirifxrayUtil.getUnknownLocation());
-		pi.setIdentifierType(HirifxrayUtil.getIdentifierType());
+		pi.setLocation(HirifMetadata.getUnknownLocation());
+		pi.setIdentifierType(HirifMetadata.getIdentifierType());
 		pi.setIdentifier(identifier);
 		p.addIdentifier(pi);
 
@@ -130,60 +121,46 @@ public class ParticipantController {
 
 	@RequestMapping("/module/hirifxray/uploadXray.form")
 	public String uploadXray(ModelMap model,
-							 @RequestParam(value="patientId", required=true) Integer patientId,
-							 @RequestParam(value="type", required=true) String type,
-							 @RequestParam(value="statusQuestion", required=true) Concept statusQuestion,
-							 @RequestParam(value="statusAnswer", required=false) Concept statusAnswer,
-							 @RequestParam(value="concept", required=true) Concept concept,
-							 @RequestParam(value="obsDatetime", required=false) Date obsDatetime,
+							 @RequestParam(value="patientId", required=true) Patient patient,
+							 @RequestParam(value="xrayId", required=false) Encounter encounter,
+							 @RequestParam(value="xrayDate", required=false) Date encounterDate,
+							 @RequestParam(value="type", required=true) Concept type,
+							 @RequestParam(value="status", required=false) Concept status,
+							 @RequestParam(value="location", required=false) Concept location,
 							 @RequestParam(value="xrayFile", required=false) MultipartFile xrayFile) throws Exception {
 
-		Patient p = Context.getPatientService().getPatient(patientId);
-
-		if (statusAnswer != null) {
-			Obs o = new Obs();
-			o.setPerson(p);
-			o.setObsDatetime(obsDatetime == null ? new Date() : obsDatetime);
-			o.setConcept(statusQuestion);
-			o.setValueCoded(statusAnswer);
-			Context.getObsService().saveObs(o, "Saved status for " + type);
-		}
-		else {
-			List<Obs> l = Context.getObsService().getObservationsByPersonAndConcept(p, statusQuestion);
-			for (Obs o : l) {
-				Context.getObsService().voidObs(o, "Voided.");
-			}
-		}
-
+		ComplexData xrayData = null;
 		if (xrayFile != null && !xrayFile.isEmpty()) {
-			Obs o = new Obs();
-			o.setPerson(p);
-			o.setObsDatetime(obsDatetime);
-			o.setConcept(concept);
-
-			String identifier = p.getPatientIdentifier().getIdentifier();
-
+			String identifier = patient.getPatientIdentifier().getIdentifier();
 			String[] fileParts = xrayFile.getOriginalFilename().split("\\.");
 			String xrayKey = identifier + "_" + type + "." + fileParts[fileParts.length-1];
-
-			ComplexData data = new ComplexData(xrayKey, xrayFile.getInputStream());
-			o.setComplexData(data);
-
-			Context.getObsService().saveObs(o, "Uploaded image for " + type);
+			xrayData = new ComplexData(xrayKey, xrayFile.getInputStream());
 		}
 
-		return "redirect:/module/hirifxray/participant.form?id="+p.getPatientId() + "&type="+type;
+		if (encounter == null) {
+			encounter = new Encounter();
+			encounter.setPatient(patient);
+			encounter.setEncounterType(HirifMetadata.getEncounterType());
+		}
+		encounter.setEncounterDatetime(encounterDate == null ? HirifUtil.dateMidnight() : encounterDate);
+
+		HirifUtil.updateCodedObs(encounter, HirifMetadata.getXrayTypeConcept(), type);
+		HirifUtil.updateCodedObs(encounter, HirifMetadata.getXrayStatusConcept(), status);
+		HirifUtil.updateCodedObs(encounter, HirifMetadata.getXrayLocationConcept(), location);
+		HirifUtil.updateComplexObs(encounter, HirifMetadata.getXrayImageConcept(), xrayData);
+
+		encounter = Context.getEncounterService().saveEncounter(encounter);
+
+		return "redirect:/module/hirifxray/participant.form?id="+patient.getPatientId() + "&type="+type + "&xrayId="+ encounter.getEncounterId();
 	}
 
 	@RequestMapping("/module/hirifxray/deleteXray.form")
 	public String deleteXray(ModelMap model,
-							 @RequestParam(value="patientId", required=true) Integer patientId,
-							 @RequestParam(value="type", required=true) String type,
-							 @RequestParam(value="obsId", required=true) Integer obsId) throws Exception {
+							 @RequestParam(value="xrayId", required=true) Encounter encounter) throws Exception {
 
-		Obs o = Context.getObsService().getObs(obsId);
-		Context.getObsService().voidObs(o, "Deleting xray");
+		Integer pId = encounter.getPatient().getPatientId();
+		Context.getEncounterService().voidEncounter(encounter, "Deleting xray");
 
-		return "redirect:/module/hirifxray/participant.form?id="+patientId + "&type="+type;
+		return "redirect:/module/hirifxray/participant.form?id="+pId;
 	}
 }
