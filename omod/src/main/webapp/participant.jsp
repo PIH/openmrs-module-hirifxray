@@ -159,10 +159,6 @@
 											</select>
 										</td>
 									</tr>
-									<tr class="xrayDetailSection" style="display:none;">
-										<td><spring:message code="hirifxray.dateOfXray"/></td>
-										<td><openmrs_tag:dateField formFieldName="xrayDate" startValue="${xray.date}"/></td>
-									</tr>
 									<tr class="xrayDetailSection">
 										<td><spring:message code="hirifxray.imageToUpload"/></td>
 										<td><input type="file" name="xrayFile" size="50"/></td>
