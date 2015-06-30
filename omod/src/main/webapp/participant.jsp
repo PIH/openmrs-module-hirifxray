@@ -25,6 +25,10 @@
 		<c:if test="${xray.status == notDoneStatus}">
 			jQuery(".xrayDetailSection").hide();
 		</c:if>
+        jQuery(".editPrivilegeRequired").hide();
+        <openmrs:hasPrivilege privilege="Edit Xray">
+            jQuery(".editPrivilegeRequired").show();
+        </openmrs:hasPrivilege>
 	});
 </script>
 
@@ -78,7 +82,7 @@
 				</table>
 				<br/>
 				<span class="viewMode">
-					<input type="button" id="editButton" value="<spring:message code="hirifxray.edit"/>"/>
+					<input type="button" id="editButton" class="editPrivilegeRequired" value="<spring:message code="hirifxray.edit"/>"/>
 				</span>
 				<span class="editMode">
 					<input type="submit" value="<spring:message code="hirifxray.save"/>"/>
@@ -109,7 +113,7 @@
 						</tr>
 					</c:forEach>
 					<c:if test="${!neverDone}">
-						<tr>
+						<tr class="editPrivilegeRequired">
 							<td style="font-size:smaller; padding-left:20px;${empty xray.id && type == xrayType ? "background-color:yellow;": ""}">
 								<a href="participant.form?id=${patient.patientId}&type=${xrayType.conceptId}">
 									[+] <spring:message code="hirifxray.add"/>
@@ -134,7 +138,7 @@
 				<div style="height:460px; padding:10px;">
 					<c:choose>
 						<c:when test="${empty xray.imageObs}">
-							<form action="uploadXray.form" method="post" enctype="multipart/form-data">
+							<form action="uploadXray.form" method="post" enctype="multipart/form-data" class="editPrivilegeRequired">
 								<input type="hidden" name="patientId" value="${patient.patientId}"/>
 								<input type="hidden" name="type" value="${type.conceptId}"/>
 								<input type="hidden" name="xrayId" value="${xray.id}"/>
@@ -182,7 +186,7 @@
 				</div>
 				<c:if test="${!empty xray.id}">
 					<div style="width:100%; text-align:right;">
-						<input type="button" onclick="if (confirm('<spring:message code="hirifxray.confirmDelete"/>')) {document.location.href='deleteXray.form?xrayId=${xray.id}';}" value="<spring:message code="hirifxray.deleteXray"/>">
+						<input type="button" class="editPrivilegeRequired" onclick="if (confirm('<spring:message code="hirifxray.confirmDelete"/>')) {document.location.href='deleteXray.form?xrayId=${xray.id}';}" value="<spring:message code="hirifxray.deleteXray"/>">
 					</div>
 				</c:if>
 			</fieldset>

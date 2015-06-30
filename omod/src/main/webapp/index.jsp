@@ -36,20 +36,22 @@
 						<span style="font-weight:bold; color:red">
 							<spring:message code="hirifxray.noMatchingParticipants"/>.
 						</span>
-						<br/><br/>
-						<spring:message code="hirifxray.ifWishToSaveEnterDetails"/><br/><br/>
-						<form method="post" action="${pageContext.request.contextPath}/module/hirifxray/createParticipant.form">
-							<b><spring:message code="hirifxray.participantId"/>:</b><br/>
-							<input type="hidden" name="identifier" value="${identifier}"/>
-							${identifier}
-							<br/><br/>
-							<b><spring:message code="hirifxray.gender"/></b><br/>
-							<input type="radio" name="gender" value="M"/> <spring:message code="hirifxray.gender.M"/>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<input type="radio" name="gender" value="F"/> <spring:message code="hirifxray.gender.F"/>
-							<br/><br/>
-							<input type="submit" value="<spring:message code="hirifxray.createParticipant"/>"/>
-						</form>
+                        <openmrs:hasPrivilege privilege="Edit Xray">
+                            <br/><br/>
+                            <spring:message code="hirifxray.ifWishToSaveEnterDetails"/><br/><br/>
+                            <form method="post" action="${pageContext.request.contextPath}/module/hirifxray/createParticipant.form">
+                                <b><spring:message code="hirifxray.participantId"/>:</b><br/>
+                                <input type="hidden" name="identifier" value="${identifier}"/>
+                                ${identifier}
+                                <br/><br/>
+                                <b><spring:message code="hirifxray.gender"/></b><br/>
+                                <input type="radio" name="gender" value="M"/> <spring:message code="hirifxray.gender.M"/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="radio" name="gender" value="F"/> <spring:message code="hirifxray.gender.F"/>
+                                <br/><br/>
+                                <input type="submit" value="<spring:message code="hirifxray.createParticipant"/>"/>
+                            </form>
+                        </openmrs:hasPrivilege>
 					</c:when>
 					<c:otherwise></c:otherwise>
 				</c:choose>
